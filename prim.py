@@ -128,6 +128,9 @@ def prim_algorithm(
         ]
     else:
         reserved_cells = []
+    if reserved(en, reserved_cells) or reserved(ex, reserved_cells):
+        print("Error: entrance and exit can't be in the 42 drawing")
+        sys.exit(1)
     cells_in_maze_set = set()
     while len(cells_in_maze_set) < (height * width) - len(reserved_cells):
         if len(cells_in_maze) == 0:
@@ -220,3 +223,54 @@ def main():
 
 
 main()
+from PIL import Image, ImageDraw
+
+# Your maze as a list of strings
+maze_hex = [
+    "93B9555517",
+    "AC40555783",
+    "AF907FFFEA",
+    "AFEC157FD2",
+    "AFFFAFFF96",
+    "813FAFD503",
+    "AAEFAFFFEE",
+    "AED541517B",
+    "87D1103852",
+    "C57EEEEC7E"
+]
+
+cell_size = 40
+wall_width = 6
+rows = len(maze_hex)
+cols = len(maze_hex[0])
+
+img_width = cols * cell_size + wall_width
+img_height = rows * cell_size + wall_width
+img = Image.new("RGB", (img_width, img_height), "white")
+draw = ImageDraw.Draw(img)
+
+def hex_to_int(h):
+    return int(h, 16)
+
+for y, row in enumerate(maze_hex):
+    for x, hex_digit in enumerate(row):
+        cell = hex_to_int(hex_digit)
+        x0 = x*cell_size
+        y0 = y*cell_size
+        x1 = x0 + cell_size
+        y1 = y0 + cell_size
+
+        draw.rectangle([x0, y0, x1, y1], fill="#F0F0F0")
+
+        if cell & 1:
+            draw.line([(x0, y0), (x1, y0)], fill="black", width=wall_width)
+        if cell & 2:
+            draw.line([(x1, y0), (x1, y1)], fill="black", width=wall_width)
+        if cell & 4:
+            draw.line([(x0, y1), (x1, y1)], fill="black", width=wall_width)
+        if cell & 8:
+            draw.line([(x0, y0), (x0, y1)], fill="black", width=wall_width)
+
+draw.rectangle([0, 0, cols*cell_size, rows*cell_size], outline="black", width=wall_width)
+
+img.save("maze.png")

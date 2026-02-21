@@ -1,35 +1,110 @@
 import random
 import sys
 import time
+from colorama import Fore, Style
 from Point import Point
 
 
-def display_line(line):
-    for i in line:
-        if i - 1 & 1:
-            print('█'*3, end='')
-        else:
-            print('█ █', end='')
+def display_line(maze, entry, leave):
+    colors = [
+        Fore.RED,
+        Fore.GREEN,
+        Fore.MAGENTA,
+        Fore.WHITE,
+        Fore.CYAN,
+        Fore.YELLOW
+    ]
+    c1 = random.choice(colors)
+    colors.pop(colors.index(c1))
+    c2 = random.choice(colors)
+    colors.pop(colors.index(c2))
+    c3 = random.choice(colors)
+    colors.pop(colors.index(c3))
+    c4 = random.choice(colors)
+    colors.pop(colors.index(c4))
+    
+
+    row = 0
+    for line in maze:
         time.sleep(0.01)
-    print()
-    for i in line:
-        if i - 1 & 8:
-            print('█ ', end='')
-        else:
-            print('  ', end='')
-        if i - 1 & 2:
-            print('█', end='')
-        else:
-            print(' ', end='')
-        
-    print()
-    for i in line:
-        if i - 1 & 4:
-            print('█'*3, end='')
-        else:
-             print('█ █', end='')
-        time.sleep(0.01)
-    print()
+        for i in line:
+            if ((i - 1) & 15) == 15:
+                print(c3 + '█'*3, end='')
+                print(Style.RESET_ALL, end='')
+            elif i - 1 & 1:
+                print(c1 + '█'*3, end='')
+                print(Style.RESET_ALL, end='')
+            else:
+                print(c1 + '█ █', end='')
+                print(Style.RESET_ALL, end='')
+            time.sleep(0.01)
+        print()
+        col = 0
+        for i in line:
+            if (i - 1) & 15 == 15:
+                print(c3 + '█'*3, end='')
+                print(Style.RESET_ALL, end='')
+                col += 1
+                continue
+            if row == entry.row and col == entry.column:
+                if i - 1 & 8:
+                    print(c1 + '█', end='')
+                    print(Style.RESET_ALL, end='')
+                else:
+                    print(' ', end='')
+                print(c2 + '█', end='')
+                print(Style.RESET_ALL, end='')
+                if i - 1 & 2:
+                    print(c1 + '█', end='')
+                    print(Style.RESET_ALL, end='')
+                else:
+                    print(' ', end='')
+                col += 1
+                continue
+            
+            if row == leave.row and col == leave.column:
+                if i - 1 & 8:
+                    print(c1 + '█', end='')
+                    print(Style.RESET_ALL, end='')
+                else:
+                    print(' ', end='')
+                print(c4 + '█', end='')
+                print(Style.RESET_ALL, end='')
+                if i - 1 & 2:
+                    print(c1 + '█', end='')
+                    print(Style.RESET_ALL, end='')
+                else:
+                    print(' ', end='')
+                col += 1
+                continue
+
+            elif i - 1 & 8:
+                print(c1 + '█ ', end='')
+                print(Style.RESET_ALL, end='')
+            else:
+                print('  ', end='')
+            
+            if i - 1 & 2:
+                print(c1 + '█', end='')
+                print(Style.RESET_ALL, end='')
+            else:
+                print(' ', end='')
+            col += 1
+            
+        print()
+        for i in line:
+            if (i - 1) & 15 == 15:
+                print(c3 + '█'*3, end='')
+                print(Style.RESET_ALL, end='')
+            elif i - 1 & 4:
+                print(c1 + '█'*3, end='')
+                print(Style.RESET_ALL, end='')
+            else:
+                print(c1 + '█ █', end='')
+                print(Style.RESET_ALL, end='')
+            time.sleep(0.01)
+        print()
+        row += 1
 
 
 def collect_maze_info(filename: str):
@@ -224,10 +299,9 @@ def prim_algorithm(
                 cells_in_maze_set.add((open_cell.row, open_cell.column))
 
     i = 0
-    for line in maze:
-        display_line(line)
-        time.sleep(0.01)
+    display_line(maze, en, ex)
     output_file = open(file, 'w+')
+    display_line(maze, en, ex)
     while i < height:
         j = 0
         line = ""
